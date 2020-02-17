@@ -1,0 +1,385 @@
+/******************************************************************************
+*
+* Copyright (C) 2009 - 2014 Xilinx, Inc.  All rights reserved.
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in
+* all copies or substantial portions of the Software.
+*
+* Use of the Software is limited solely to applications:
+* (a) running on a Xilinx device, or
+* (b) that interact with a Xilinx device through a bus or interconnect.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+* XILINX  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+* OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+*
+* Except as contained in this notice, the name of the Xilinx shall not be used
+* in advertising or otherwise to promote the sale, use or other dealings in
+* this Software without prior written authorization from Xilinx.
+*
+******************************************************************************/
+
+/*
+ * helloworld.c: simple test application
+ *
+ * This application configures UART 16550 to baud rate 9600.
+ * PS7 UART (Zynq) is not initialized by this application, since
+ * bootrom/bsp configures it to baud rate 115200
+ *
+ * ------------------------------------------------
+ * | UART TYPE   BAUD RATE                        |
+ * ------------------------------------------------
+ *   uartns550   9600
+ *   uartlite    Configurable only in HW design
+ *   ps7_uart    115200 (configured by bootrom/bsp)
+ */
+
+#include <stdio.h>
+#include "xparameters.h"
+#include "platform.h"
+#include "xil_printf.h"
+#include "xgpio.h"
+#include "objectbuffer.h"
+
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include "xparameters.h"
+#include "xbasic_types.h"
+//#include "xbram.h"
+#include "sleep.h"
+
+
+
+volatile uint32_t *video_bram = (uint32_t *) XPAR_BRAM_0_BASEADDR;
+
+struct Obje {
+ int  x,y,width,height;
+ uint32_t  color;
+ uint8_t   type;
+};
+
+
+
+u32 btn_now = 0;
+u32 btn_prev = 0;
+
+int toggle = 0;
+int player_1_sag = 0; //0 sol 1 sag
+int kesilen_dal = 0;
+
+int obje_sayisi = 15;
+struct Obje sabitler[10];
+struct Obje dallar[5];
+
+//sabitler
+struct Obje agac_govde;
+struct Obje ayirac;
+struct Obje zemin;
+struct Obje can_bari;
+struct Obje can_bari_arka;
+struct Obje adam;
+struct Obje kesilen;
+
+
+void obje_at(struct Obje o, volatile uint32_t ram[], int start) {
+
+	ram[start] = (o.x<<16) | o.y; // x 100 y 100
+	ram[start+1] = (o.width<<16) | o.height; // w 100 h 100
+	ram[start+2] = o.type << 24 | o.color;
+	ram[start+3] = 0x00000008;
+}
+
+
+void sabitler_init(void);
+
+////DALLAR
+int dal_start_sol = 15;
+int dal_start_sag = 365;
+int dal_y_artis = 200;
+int dal_y_start = 20;
+int dal_sayisi = 4;
+
+
+void yandin(void);
+int dal_x_rand(void);
+void big_init(void);
+
+void dallar_render() {
+  //return;
+  for(int i=0; i<4; i++) {
+    obje_at(dallar[i], video_bram, i*4+24);
+  }
+}
+
+
+void dallar_arttir() {
+
+  for(int i=0; i<dal_sayisi; i++) {
+    dallar[i].y += dal_y_artis;
+    //Eger en asagi inerse tekrar yukaridan baslat
+    if (dallar[i].y >= dal_y_start+dal_sayisi*dal_y_artis) {
+      dallar[i].y = dal_y_start;
+      dallar[i].x = dal_x_rand();
+    }
+  }
+}
+
+void carpma_kontrol() {
+  for(int i=0; i<dal_sayisi; i++) {
+	if(dallar[i].y == dal_y_start + dal_y_artis*3) {
+		if(dallar[i].x == (dal_start_sol + player_1_sag*(dal_start_sag-dal_start_sol ) )) {
+			yandin();
+		}
+	  }
+  }
+}
+
+void dallar_init(){
+
+  //Dallari olustur
+  for(int i=0; i<dal_sayisi; i++) {
+    dallar[i].x = dal_x_rand();
+    dallar[i].y = dal_y_start - (dal_sayisi - 2)*dal_y_artis + i*dal_y_artis;
+    dallar[i].width = 250;
+    dallar[i].height = 60;
+    dallar[i].type = 9;
+    dallar[i].color = 0xFFFF00;
+  }
+
+  dallar_render();
+}
+
+
+
+
+int main()
+{
+
+	int status;
+	XGpio btn;
+
+	init_platform();
+
+	print("Initializing Buttons & Switches\n");
+	status = XGpio_Initialize(&btn, XPAR_AXI_GPIO_0_DEVICE_ID);
+	if (status != XST_SUCCESS) { return XST_FAILURE; }
+	// set the direction to input
+	XGpio_SetDataDirection(&btn, 1, 0xFF); // Channel 1
+
+
+	// Make sure XPAR_BRAM_0_BASEADDR is the extra BRAM that you added
+
+	// Writing 32-bits at a time for each address.
+	//video_bram = (uint32_t *) XPAR_BRAM_0_BASEADDR;
+
+
+	//USER CODE
+	big_init();
+
+	void anim_kes() {
+		if(player_1_sag) adam.type = 6;
+		else adam.type = 5;
+
+		kesilen_dal += 1;
+		dallar_arttir();
+		carpma_kontrol();
+	}
+
+	void anim_idle() {
+		if(player_1_sag) adam.type = 4;
+		else adam.type = 3;
+	}
+
+	void adam_sag() {
+		player_1_sag = 1;
+		adam.x = 325;
+	}
+
+	void adam_sol() {
+		player_1_sag = 0;
+		adam.x = 140;
+	}
+
+	void render() {
+
+		//objeler[5] = adam;
+		obje_at(adam, video_bram, 20);
+		dallar_render();
+		gosterge_guncelle();
+	}
+
+
+
+
+
+	while(1) {
+		btn_prev = btn_now;
+		btn_now = XGpio_DiscreteRead(&btn, 1);
+
+
+		// buton isleri
+		if(btn_now == 0) anim_idle();
+		if(btn_prev == 0 && btn_now == 8) {
+			adam_sol();
+			anim_kes();
+		}
+		if(btn_prev == 0 && btn_now == 4) {
+			adam_sag();
+			anim_kes();
+		}
+
+
+
+		render();
+		usleep(3000);
+	}
+
+
+
+	cleanup_platform();
+	return 0;
+}
+
+
+void sabitler_init() {
+  agac_govde.x = 265;
+  agac_govde.y = 0;
+  agac_govde.width = 100;
+  agac_govde.height = 720;
+  agac_govde.type = 9;
+  agac_govde.color = 0x00FF00;
+
+  ayirac.x = 630;
+  ayirac.y = 0;
+  ayirac.width = 20;
+  ayirac.height = 720;
+  ayirac.type = 1;
+  ayirac.color = 0x000000;
+
+  zemin.x = 0;
+  zemin.y = 700;
+  zemin.width = 1280;
+  zemin.height = 20;
+  zemin.type = 1;
+  zemin.color = 0x00FF00;
+
+  can_bari.x = 65;
+  can_bari.y = 20;
+  can_bari.width = 0; // 500
+  can_bari.height = 0; // 26
+  can_bari.type = 1;
+  can_bari.color = 0xFF0000;
+
+  can_bari_arka.x = 60; //60
+  can_bari_arka.y = 15; //15
+  can_bari_arka.width = 0; //510
+  can_bari_arka.height = 0; //36
+  can_bari_arka.type = 1;
+  can_bari_arka.color = 0x000000;
+
+
+  sabitler[0] = zemin;
+  sabitler[1] = ayirac;
+  sabitler[2] = agac_govde;
+  sabitler[3] = can_bari_arka;
+  sabitler[4] = can_bari;
+
+  for(int i=0; i<5; i++) {
+    obje_at(sabitler[i], video_bram, i*4);
+  }
+
+  //Ilk reserved bit e obje sayisini ekle
+  video_bram[3] = obje_sayisi;
+}
+
+
+void yanma_anim(int adres) {
+	adam.color = 0xFF0000;
+	obje_at(adam, video_bram, 20);
+
+	struct Obje yanma;
+		yanma.x = 20;
+		yanma.y = 20;
+		yanma.type = 1;
+		yanma.color = 0xFF0000;
+
+	for(int i=0; i<7; i++) {
+		if( i%2 == 0) {
+			yanma.width = 0;
+			yanma.height = 0;
+		}
+		else {
+			yanma.width = 620;
+			yanma.height = 680;
+		}
+
+		obje_at(yanma, video_bram, adres);
+
+		usleep(50000);
+	}
+
+}
+
+void yandin() {
+	//durdur
+	//yanma animasyonu
+	yanma_anim(52);
+	big_init();
+}
+
+int dal_x_rand() {
+
+	  return dal_start_sol + (rand() & 1)*(350);
+}
+
+
+void big_init(){
+	btn_now = 0;
+	btn_prev = 0;
+
+	toggle = 0;
+	player_1_sag = 0;
+	kesilen_dal = 0;
+
+
+	srand();
+	sabitler_init();
+	dallar_init();
+
+	///ADAM INIT
+   adam.x = 140; //115
+   adam.y = 560; //520
+   adam.width = 160;
+   adam.height = 160;
+   adam.type = 1;
+   adam.color = 0x00FF99;
+
+	///gosterge INIT
+  kesilen.x = 680; //115
+  kesilen.y = 700; //520
+  kesilen.width = 570;
+  kesilen.height = 0;
+  kesilen.type = 1;
+  kesilen.color = 0xFF6130;
+
+
+}
+
+void gosterge_guncelle() {
+	int artis = 7;
+	kesilen.height = (kesilen_dal * artis);
+	kesilen.y = 700 - kesilen.height;
+
+	obje_at(kesilen, video_bram, 56);
+}

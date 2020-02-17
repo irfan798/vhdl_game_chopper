@@ -1,0 +1,61 @@
+{
+   ExpandedHierarchyInLayout: "",
+   PinnedBlocks: "",
+   PinnedPorts: "",
+   guistr: "# # String gsaved with Nlview 6.8.5  2018-01-30 bk=1.4354 VDI=40 GEI=35 GUI=JA:1.6 TLS
+#  -string -flagsOSRD
+preplace port btns_4bits -pg 1 -y 860 -defaultsOSRD
+preplace port DDR -pg 1 -y 580 -defaultsOSRD
+preplace port hdmi_out_0 -pg 1 -y 730 -defaultsOSRD
+preplace port FIXED_IO -pg 1 -y 600 -defaultsOSRD
+preplace inst smartconnect_0 -pg 1 -lvl 2 -y 680 -defaultsOSRD
+preplace inst axi_bram_ctrl_0_bram -pg 1 -lvl 6 -y 390 -defaultsOSRD
+preplace inst displaybuffer_0 -pg 1 -lvl 5 -y 460 -defaultsOSRD
+preplace inst proc_sys_reset_0 -pg 1 -lvl 3 -y 470 -defaultsOSRD
+preplace inst axi_gpio_0 -pg 1 -lvl 3 -y 860 -defaultsOSRD
+preplace inst system_ila_0 -pg 1 -lvl 6 -y 80 -defaultsOSRD
+preplace inst clk_wiz_0 -pg 1 -lvl 2 -y 380 -defaultsOSRD
+preplace inst rst_ps7_0_100M -pg 1 -lvl 2 -y 860 -defaultsOSRD
+preplace inst axi_bram_ctrl_0 -pg 1 -lvl 3 -y 720 -defaultsOSRD
+preplace inst vtg_0 -pg 1 -lvl 4 -y 720 -defaultsOSRD
+preplace inst rgb2tmds_0 -pg 1 -lvl 6 -y 750 -defaultsOSRD
+preplace inst processing_system7_0 -pg 1 -lvl 1 -y 620 -defaultsOSRD
+preplace netloc processing_system7_0_DDR 1 1 6 NJ 580 790J 610 NJ 610 NJ 610 NJ 610 2200J
+preplace netloc smartconnect_0_M02_AXI 1 2 1 N
+preplace netloc smartconnect_0_M01_AXI 1 2 1 790
+preplace netloc clk_wiz_0_pixelclock 1 2 4 810 370 1180 370 1480J 290 1900
+preplace netloc displaybuffer_0_obj_x_out 1 5 1 1810
+preplace netloc objectbuffer_0_rgb 1 5 1 1820
+preplace netloc vtg_0_vsync 1 4 2 1490 720 NJ
+preplace netloc clk_wiz_0_serialclock 1 2 4 790 300 NJ 300 NJ 300 1850J
+preplace netloc displaybuffer_0_obj_render_bit 1 5 1 1890
+preplace netloc axi_bram_ctrl_0_BRAM_PORTA 1 3 3 1170 280 N 280 1920
+preplace netloc processing_system7_0_M_AXI_GP0 1 1 1 430
+preplace netloc displaybuffer_0_bram_wenb 1 5 1 1860
+preplace netloc rst_ps7_0_100M_peripheral_aresetn 1 2 1 810
+preplace netloc displaybuffer_0_bram_rstb 1 5 1 1920
+preplace netloc processing_system7_0_FCLK_RESET0_N 1 1 2 420 450 NJ
+preplace netloc vtg_0_pixel_x 1 4 2 1450 40 N
+preplace netloc rgb2tmds_0_hdmi_out 1 6 1 2200J
+preplace netloc displaybuffer_0_bram_dinb 1 5 1 1880
+preplace netloc vtg_0_video_active 1 4 2 1480 700 NJ
+preplace netloc vtg_0_pixel_y 1 4 2 1470 60 N
+preplace netloc proc_sys_reset_0_interconnect_aresetn 1 1 3 450 570 NJ 570 1150
+preplace netloc processing_system7_0_FIXED_IO 1 1 6 NJ 600 NJ 600 NJ 600 1460J 620 NJ 620 2210J
+preplace netloc axi_gpio_0_GPIO 1 3 4 NJ 860 NJ 860 1870J 880 2210J
+preplace netloc proc_sys_reset_0_peripheral_reset 1 3 3 1160 830 NJ 830 1920
+preplace netloc displaybuffer_0_counter_out 1 5 1 1830
+preplace netloc vtg_0_hsync 1 4 2 N 710 1810J
+preplace netloc processing_system7_0_FCLK_CLK0 1 0 3 20 520 440 760 800
+preplace netloc objectbuffer_0_bram_addrb 1 5 1 1840
+preplace netloc displaybuffer_0_bram_enb 1 5 1 1870
+preplace netloc rst_ps7_0_100M_interconnect_aresetn 1 2 1 N
+preplace netloc axi_bram_ctrl_0_bram_doutb 1 4 2 1490 310 1910J
+levelinfo -pg 1 0 220 620 980 1350 1660 2060 2250 -top -30 -bot 950
+",
+}
+{
+   da_axi4_cnt: "1",
+   da_bram_cntlr_cnt: "1",
+   da_clkrst_cnt: "1",
+}

@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2018.2.2 (64-bit)
+# SW Build 2348494 on Mon Oct  1 18:25:39 MDT 2018
+# IP Build 2318053 on Mon Oct  1 21:44:26 MDT 2018
+# Start of session at: Mon Jan 21 00:25:51 2019
+# Process ID: 11055
+# Current directory: /home/irfan/Vivado/pinpon3/pinpon3.runs/impl_2
+# Command line: vivado -log design_1_wrapper.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source design_1_wrapper.tcl -notrace
+# Log file: /home/irfan/Vivado/pinpon3/pinpon3.runs/impl_2/design_1_wrapper.vdi
+# Journal file: /home/irfan/Vivado/pinpon3/pinpon3.runs/impl_2/vivado.jou
+#-----------------------------------------------------------
+source design_1_wrapper.tcl -notrace
